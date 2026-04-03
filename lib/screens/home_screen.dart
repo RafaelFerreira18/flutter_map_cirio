@@ -21,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   _RouteMode _mode = _RouteMode.none;
   LatLng? _userLocation;
   List<LatLng>? _dynamicRoute;
+  List<LatLng>? _cirioRoute;
+  List<LatLng>? _trasladacaoRoute;
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -90,17 +92,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildPolylines() {
     return PolylineLayer(
       polylines: [
-        if (_mode == _RouteMode.cirio)
+        if (_mode == _RouteMode.cirio && _cirioRoute != null)
           Polyline(
-            points: AppConstants.rotaCirio,
+            points: _cirioRoute!,
             color: const Color(0xFF1565C0),
             strokeWidth: 5.0,
             borderColor: const Color(0xFF0D47A1),
             borderStrokeWidth: 1.5,
           ),
-        if (_mode == _RouteMode.trasladacao)
+        if (_mode == _RouteMode.trasladacao && _trasladacaoRoute != null)
           Polyline(
-            points: AppConstants.rotaTrasladacao,
+            points: _trasladacaoRoute!,
             color: const Color(0xFF2E7D32),
             strokeWidth: 5.0,
             borderColor: const Color(0xFF1B5E20),
@@ -189,7 +191,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
 
   Widget _buildLoadingOverlay() {
     return Container(
@@ -290,13 +291,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget _buildBottomBar() {
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF0D47A1),
         boxShadow: [
-          BoxShadow(color: Colors.black38, blurRadius: 8, offset: Offset(0, -2)),
+          BoxShadow(
+            color: Colors.black38,
+            blurRadius: 8,
+            offset: Offset(0, -2),
+          ),
         ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
@@ -345,7 +349,9 @@ class _HomeScreenState extends State<HomeScreen> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
-            color: selected ? activeColor.withOpacity(0.22) : Colors.transparent,
+            color: selected
+                ? activeColor.withOpacity(0.22)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             border: selected
                 ? Border.all(color: activeColor, width: 1.5)
@@ -365,8 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   color: selected ? activeColor : Colors.white54,
                   fontSize: 12,
-                  fontWeight:
-                      selected ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: selected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
               Text(
@@ -384,7 +389,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
 
   Future<void> _toggleRoute(_RouteMode mode) async {
     if (_mode == mode) {
@@ -405,13 +409,41 @@ class _HomeScreenState extends State<HomeScreen> {
 
     switch (mode) {
       case _RouteMode.cirio:
-        _fitPoints(AppConstants.rotaCirio);
+        await _loadStaticRoute(
+          AppConstants.rotaCirio,
+          (route) => _cirioRoute = route,
+        );
       case _RouteMode.trasladacao:
-        _fitPoints(AppConstants.rotaTrasladacao);
+        await _loadStaticRoute(
+          AppConstants.rotaTrasladacao,
+          (route) => _trasladacaoRoute = route,
+        );
       case _RouteMode.minhaRota:
         await _loadUserRoute();
       case _RouteMode.none:
         break;
+    }
+  }
+
+  Future<void> _loadStaticRoute(
+    List<LatLng> waypoints,
+    void Function(List<LatLng>) setRoute,
+  ) async {
+    setState(() => _isLoading = true);
+
+    final route = await RoutingService.getRouteMultiWaypoint(waypoints);
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (route != null && route.isNotEmpty) {
+      setState(() => setRoute(route));
+      _fitPoints(route);
+    } else {
+      // Fallback: usa os pontos originais se a API falhar
+      setState(() => setRoute(waypoints));
+      _fitPoints(waypoints);
     }
   }
 
@@ -435,8 +467,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() => _userLocation = userPos);
 
-    final route =
-        await RoutingService.getRoute(userPos, AppConstants.pontoInicial);
+    final route = await RoutingService.getRoute(
+      userPos,
+      AppConstants.pontoInicial,
+    );
 
     if (!mounted) return;
 
@@ -489,7 +523,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
   _InfoData _routeInfo(_RouteMode mode) {
     switch (mode) {
       case _RouteMode.cirio:
@@ -523,7 +556,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 }
-
 
 class _InfoData {
   final String title;
