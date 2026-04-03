@@ -16,14 +16,14 @@ class AppConstants {
   // Catedral da Sé → Av. Presidente Vargas → Praça da República
   //   → Av. Nazaré → Basílica de Nazaré
   static const List<LatLng> rotaCirio = [
-    LatLng(-1.4537, -48.5027), // Catedral da Sé — Início
-    LatLng(-1.4537, -48.5005), // Av. Presidente Vargas (saída da Sé)
-    LatLng(-1.4538, -48.4980), // Av. Presidente Vargas
-    LatLng(-1.4538, -48.4955), // Praça da República
-    LatLng(-1.4542, -48.4933), // Av. Presidente Vargas (após Praça)
-    LatLng(-1.4555, -48.4910), // Av. Nazaré — início da descida sul
-    LatLng(-1.4562, -48.4898), // Av. Nazaré
-    LatLng(-1.4568, -48.4889), // Basílica de Nazaré — Fim
+    LatLng(-1.4537, -48.5027),
+    LatLng(-1.4537, -48.5005),
+    LatLng(-1.4538, -48.4980),
+    LatLng(-1.4538, -48.4955),
+    LatLng(-1.4542, -48.4933),
+    LatLng(-1.4555, -48.4910),
+    LatLng(-1.4562, -48.4898),
+    LatLng(-1.4568, -48.4889),
   ];
 
   // ── Rota da Trasladação (Sábado) ──────────────────────────────────────────
@@ -31,17 +31,16 @@ class AppConstants {
   // Basílica de Nazaré → Av. Nazaré → Praça da República
   //   → Av. Presidente Vargas → Catedral da Sé
   static const List<LatLng> rotaTrasladacao = [
-    LatLng(-1.4568, -48.4889), // Basílica de Nazaré — Início
-    LatLng(-1.4562, -48.4898), // Av. Nazaré
-    LatLng(-1.4555, -48.4910), // Av. Nazaré — fim da subida norte
-    LatLng(-1.4542, -48.4933), // Av. Presidente Vargas
-    LatLng(-1.4538, -48.4955), // Praça da República
-    LatLng(-1.4538, -48.4980), // Av. Presidente Vargas
-    LatLng(-1.4537, -48.5005), // Av. Presidente Vargas (chegando à Sé)
-    LatLng(-1.4537, -48.5027), // Catedral da Sé — Fim
+    LatLng(-1.4568, -48.4889),
+    LatLng(-1.4562, -48.4898),
+    LatLng(-1.4555, -48.4910),
+    LatLng(-1.4542, -48.4933),
+    LatLng(-1.4538, -48.4955),
+    LatLng(-1.4538, -48.4980),
+    LatLng(-1.4537, -48.5005),
+    LatLng(-1.4537, -48.5027),
   ];
 
-  // ── API de roteamento (OSRM — gratuita, sem chave) ────────────────────────
   static const String osrmBase =
       'https://router.project-osrm.org/route/v1/foot';
 }
